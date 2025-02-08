@@ -4,7 +4,7 @@
 
         <el-select
             ref="select"
-            :model-value="current"
+            v-model="current"
             value-key="label"
             :placeholder="props.placeholder ?? t('filters.label')"
             default-first-option
@@ -253,9 +253,11 @@
     };
 
     const handleClear = () => {
-        current.value = [];
-        triggerSearch();
-    };
+    if (current.value.length > 0) {
+        current.value = [...current.value]; // Keeps existing selections reactive
+    }
+};
+
 
     const activeParentFilter = ref<string | null>(null);
     const lastClickedParent = ref<string | null>(null);
@@ -330,6 +332,10 @@
             activeParentFilter.value = null;
             lastClickedParent.value = null;
             showSubFilterDropdown.value = false;
+
+            // Ensure selected tags persist by forcing reactivity
+        current.value = [...current.value]; 
+            
             // If last filter item selection was not completed, remove it from array
             if (current.value?.at(-1)?.value?.length === 0) current.value.pop();
         } else {
@@ -527,7 +533,7 @@
             break;
         }
     };
-    const current = ref<CurrentItem[]>([]);
+    const current = ref<String[]>([]);
     const includedOptions = computed(() => {
         const dates = ["relative_date", "absolute_date"];
 
